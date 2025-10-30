@@ -121,9 +121,28 @@ function create_circuit(Nx::Int, Ny::Int, order; B::Float64 = 0.0, V::Float64 = 
 end
 
 
+function default_circuit_order(Nx::Int, Ny::Int, staggered::Bool, alternating::Bool)
+
+    layers=[[] for _ in 1:4]
+
+    # horizontal bonds
+    for ny in 1:Ny
+        for nx in 1:Nx-1
+            index = nx + (ny-1)*Nx
+            
+            ## NEEDS FINISHING ###
+
+        end
+    end
+
+end
+
+
 function circuit_order(Nx::Int,Ny::Int; type="Anna")
     
-    layers=[[] for _ in 1:4]
+    
+
+
     
     if type=="Anna"
         for row in 1:Ny
