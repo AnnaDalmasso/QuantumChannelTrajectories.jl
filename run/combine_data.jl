@@ -71,10 +71,8 @@ for run_idx in 1:num_processes
     global avg_dd_correlations += data[:avg_dd_correlations]
     global completed_trajectories += data[:completed_trajectories]
 
-    if run_idx == 1
-        global t_list = data[:t_list]
-        global parameters = data[:params]
-    end
+    global t_list = data[:t_list]
+    global parameters = data[:params]
 
 end
 
