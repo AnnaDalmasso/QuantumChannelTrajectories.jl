@@ -17,7 +17,9 @@ for staggered in (true, false)
         @assert valid_circuit "Generated Trotter order is invalid for staggered=$staggered, alternating=$alternating"
 
         println("Trotter order for staggered=$staggered, alternating=$alternating is:")
-        println(order)
-        println("---------------------------------------------------")
+        for layer in order
+            println(layer)
+        end
+        println("---------------------------------------------------\n")
     end
 end
