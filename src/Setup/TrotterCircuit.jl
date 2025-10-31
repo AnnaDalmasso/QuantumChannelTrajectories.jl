@@ -1,6 +1,6 @@
 export create_circuit
 export create_circuit_Adam
-export circuit_order
+export default_circuit_order
 
 
 """ Checks if the tuples in each layer are disjoint pairs of site indices. I.e., no site index appears more than once in a layer.
@@ -8,7 +8,7 @@ export circuit_order
     
     Returns true if the order is valid, false otherwise.
 """
-function check_trotter_order(Nx::Int, Ny::Int, order)::Bool
+function _check_trotter_order(Nx::Int, Ny::Int, order)::Tuple{Bool,String}
     
     for layer in order
         seen_indices = Set{Int}()
@@ -33,7 +33,7 @@ function check_trotter_order(Nx::Int, Ny::Int, order)::Bool
         end
     end
 
-    return true, message
+    return true, "Trotter order is valid."
 
 end
 
@@ -54,7 +54,7 @@ end
 """
 function create_circuit(Nx::Int, Ny::Int, order; B::Float64 = 0.0, V::Float64 = 0.0, fermions::Bool = false)
     
-    trotter_valid, message = check_trotter_order(Nx, Ny, order)
+    trotter_valid, message = _check_trotter_order(Nx, Ny, order)
     if !trotter_valid
         error("Invalid Trotter order: $message")
     end
@@ -125,57 +125,40 @@ function default_circuit_order(Nx::Int, Ny::Int, staggered::Bool, alternating::B
 
     layers=[[] for _ in 1:4]
 
-    # horizontal bonds
+    index_order = alternating ? [1,2,3,4] : [1,3,2,4]
+
+    # Horizontal bonds
     for ny in 1:Ny
-        for nx in 1:Nx-1
-            index = nx + (ny-1)*Nx
-            
-            ## NEEDS FINISHING ###
+        # shift 0 starts on site 1, shift 1 starts on site 2
+        for shift in [0,1]
+            start_col = (staggered*(ny-1)+shift)%2 + 1  # Determine starting column based on staggered and shift
 
-        end
-    end
-
-end
-
-
-function circuit_order(Nx::Int,Ny::Int; type="Anna")
-    
-    
-
-
-    
-    if type=="Anna"
-        for row in 1:Ny
-            for col in 1:Nx
-                index = col+(row-1)*Nx
-                col<Nx && (col+row)%2==0 ? push!(layers[1], (index,index+1)) : nothing    
-                row<Ny && (col+row)%2==0 ? push!(layers[3], (index,index+Nx)) : nothing    
-                col<Nx && (col+row)%2==1 ? push!(layers[2], (index,index+1)) : nothing    
-                row<Ny && (col+row)%2==1 ? push!(layers[4], (index,index+Nx)) : nothing     
-            end
-        end
-    elseif type=="Adam"
-        for row in 1:Ny
-            for col in 1:Nx
-                index = col+(row-1)*Nx
-                col<Nx && col%2==1 ? push!(layers[1], (index,index+1)) : nothing    
-                col<Nx && col%2==0 ? push!(layers[3], (index,index+1)) : nothing    
-                row<Ny && row%2==1 ? push!(layers[2], (index,index+Nx)) : nothing    
-                row<Ny && row%2==0 ? push!(layers[4], (index,index+Nx)) : nothing     
-            end
-        end
-    else   
-        for row in 1:Ny
-            for col in 1:Nx
-                index = col+(row-1)*Nx
-                col<Nx && col%2==1 ? push!(layers[1], (index,index+1)) : nothing    
-                col<Nx && col%2==0 ? push!(layers[2], (index,index+1)) : nothing    
-                row<Ny && row%2==1 ? push!(layers[3], (index,index+Nx)) : nothing    
-                row<Ny && row%2==0 ? push!(layers[4], (index,index+Nx)) : nothing     
+            for nx in start_col:2:Nx-1
+                index = nx + (ny-1)*Nx
+                
+                push!(layers[index_order[1+2*shift]], (index, index+1)) # Horizontal bonds
             end
         end
     end
-    
+
+    # Vertical bonds
+    for nx in 1:Ny
+        # shift 0 starts on site 1, shift 1 starts on site 2
+        for shift in [0,1]
+            start_col = (staggered*(nx-1)+shift)%2 + 1  # Determine starting column based on staggered and shift
+
+            for ny in start_col:2:Ny-1
+                index = nx + (ny-1)*Nx
+                
+                push!(layers[index_order[2+2*shift]], (index, index+Nx)) # Vertical bonds
+            end
+        end
+    end
+
+
     return layers
+
 end
+
+
 
