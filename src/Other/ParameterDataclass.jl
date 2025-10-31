@@ -51,6 +51,7 @@ function to_dict(params::SimulationParameters)
         :even_parity => params.even_parity,
         :pinned_corners => params.pinned_corners,
         :single_shot => params.single_shot,
+        :trotter_evolution => params.trotter_evolution,
         :n_init => params.n_init
     )
 end
@@ -72,6 +73,7 @@ function from_dict(dict::Dict)
         even_parity = dict[:even_parity],
         pinned_corners = dict[:pinned_corners],
         single_shot = dict[:single_shot],
+        trotter_evolution = dict[:trotter_evolution],
         n_init = dict[:n_init]
     )
 end
