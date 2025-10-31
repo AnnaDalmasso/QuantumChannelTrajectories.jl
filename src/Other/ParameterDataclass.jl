@@ -18,6 +18,7 @@ struct SimulationParameters
     even_parity::Bool  # Optional parameter for even parity
     pinned_corners::Bool  # Optional parameter for pinned corners
     single_shot::Bool  # Optional parameter for single shot measurements
+    trotter_evolution::Bool  # Optional parameter for Trotter evolution
     n_init::Vector{Float64}  # Optional parameter for custom initial state
 end
 
@@ -28,8 +29,9 @@ function SimulationParameters(; steps, Nx, Ny, p, bonds, site_in, site_out, dt, 
                             even_parity = false,
                             pinned_corners = false,
                             single_shot = false,
+                            trotter_evolution = false,
                             n_init = Float64[])
-    return SimulationParameters(steps, Nx, Ny, dt, p, B, bonds, site_in, site_out, drive_type, initial_state, even_parity, pinned_corners, single_shot, n_init)
+    return SimulationParameters(steps, Nx, Ny, dt, p, B, bonds, site_in, site_out, drive_type, initial_state, even_parity, pinned_corners, single_shot, trotter_evolution, n_init)
 end
 
 

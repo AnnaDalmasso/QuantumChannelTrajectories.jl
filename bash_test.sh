@@ -5,11 +5,11 @@ if [ ! -d "logs" ]; then
     mkdir logs
 fi
 
-dt=0.25
-p=0.5
-Nx=4
-Ny=4
-V=4.0
+dt=0.1
+p=0.2
+Nx=3
+Ny=3
+V=2.0
 b=0.0
 num_iterations=100
 steps=100

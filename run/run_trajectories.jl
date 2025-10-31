@@ -26,7 +26,7 @@ fermions = parse(Bool, ARGS[10])  # Whether to use fermionic statistics
 N = Nx*Ny
 site_in = 1  # Site where the current is injected
 drive_type = :current  # :current, :dephasing
-initial_state = :custom  # :checkerboard, :empty, :filled, :random, :custom
+initial_state = :random  # :checkerboard, :empty, :filled, :random, :custom
 B = b*pi # Magnetic field in units of flux quantum
 site_out = N  # Site where the current is extracted
 
@@ -34,12 +34,13 @@ site_out = N  # Site where the current is extracted
 even_parity = false  # Whether to enforce even parity
 pinned_corners = true  # Whether to pin the corners
 single_shot = false
+trotter_evolution = false  # Whether to use Trotter evolution
 # n_init = Float64[0.93797391, 0.72535065, 0.5664415,  0.38982197, 0.72511378, 0.74254689,
 #  0.64629604, 0.45322563, 0.56448664, 0.64669521, 0.56086757, 0.34403293,
 #  0.38618253, 0.4489219,  0.34381325, 0.05956293]  # Only used if initial_state = :custom
 n_init = Float64[0.98400857, 0.9067791,  0.64942285, 0.26006638, 0.90650907, 0.92126638,
  0.73589202, 0.29638348, 0.64594834, 0.73521303, 0.52024279, 0.16672827,
- 0.25717178, 0.29222877, 0.16017891, 0.01662694]
+ 0.25717178, 0.29222877, 0.16017891, 0.01662694]  # Not used unless initial_state = :custom
 
 
 
@@ -58,7 +59,8 @@ println("dt: $dt \n",
         "drive_type: $drive_type \n",
         "initial_state: $initial_state \n",
         "B: $B \n",
-        "site_out: $site_out \n")
+        "site_out: $site_out \n",
+        "trotter_evolution: $trotter_evolution \n")
 
 
 parameters = SimulationParameters(
@@ -76,6 +78,7 @@ parameters = SimulationParameters(
     even_parity=even_parity,
     pinned_corners=pinned_corners,
     single_shot=single_shot,
+    trotter_evolution=trotter_evolution,
     n_init=n_init
     )
 
@@ -97,6 +100,9 @@ if pinned_corners
 end
 if single_shot
     filename *= "_single_shot"
+end
+if trotter_evolution
+    filename *= "_trotter"
 end
 if run_id !== nothing
     filename *= "_run$(run_id)"
