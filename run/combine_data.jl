@@ -21,6 +21,7 @@ site_out = N  # Site where the current is extracted
 even_parity = false  # Whether to enforce even parity
 pinned_corners = true  # Whether to pin the corners
 single_shot = false  # Whether to perform single shot measurements
+trotter_evolution = false  # Whether to use Trotter evolution
 ###############################################
 
 bonds = get_bonds(Nx, Ny, site_in, site_out)
@@ -52,6 +53,9 @@ end
 if single_shot
     filename *= "_single_shot"
 end
+if trotter_evolution
+    filename *= "_trotter"
+end
 
 num_processes = 15
 for run_idx in 1:num_processes
@@ -71,10 +75,8 @@ for run_idx in 1:num_processes
     global avg_dd_correlations += data[:avg_dd_correlations]
     global completed_trajectories += data[:completed_trajectories]
 
-    if run_idx == 1
-        global t_list = data[:t_list]
-        global parameters = data[:params]
-    end
+    global t_list = data[:t_list]
+    global parameters = data[:params]
 
 end
 
@@ -105,6 +107,9 @@ if pinned_corners
 end
 if single_shot
     filename *= "_single_shot"
+end
+if trotter_evolution
+    filename *= "_trotter"
 end
 
 save_to_hdf5(final_data, filename * ".h5")
