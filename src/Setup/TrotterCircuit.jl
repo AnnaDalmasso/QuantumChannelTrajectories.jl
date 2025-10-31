@@ -71,7 +71,7 @@ function create_circuit(Nx::Int, Ny::Int, order; B::Float64 = 0.0, V::Float64 = 
         for indices in 1:num_indices
             x1, x2 = order[layer][indices]
             nx::Int = mod(x1-1,Nx)+1
-            ny::Int = div(x1-1,Nx)
+            ny::Int = div(x1-1,Nx)+1
             
             if abs(x1-x2)==1
 
@@ -121,7 +121,7 @@ function create_circuit(Nx::Int, Ny::Int, order; B::Float64 = 0.0, V::Float64 = 
 end
 
 
-function default_circuit_order(Nx::Int, Ny::Int, staggered::Bool, alternating::Bool)
+function default_circuit_order(Nx::Int, Ny::Int; staggered::Bool, alternating::Bool)
 
     layers=[[] for _ in 1:4]
 

@@ -38,8 +38,8 @@ function trajectory(hamiltonian, ψ_init::Vector, fermions::Bool, parameters::Si
     trotter_evolution = parameters.trotter_evolution
     n_init = parameters.n_init
 
-    if trotter_evolution && !isa(hamiltonian, Vector{SparseMatrixCSC})
-        error("For Trotter evolution, the Hamiltonian must be provided as a Vector of sparse matrices.")
+    if trotter_evolution && !isa(hamiltonian, Vector)
+        error("For Trotter evolution, the Hamiltonian must be provided as a Vector of sparse matrices. Type received: $(typeof(hamiltonian))")
     end
 
     N = Nx * Ny
