@@ -44,13 +44,27 @@ site_out = N  # Site where the current is extracted
 # Optional parameters
 even_parity = false  # Whether to enforce even parity
 pinned_corners = true  # Whether to pin the corners
-single_shot = true
+single_shot = false
+trotter_evolution = true  # Whether to use Trotter evolution
 # n_init = Float64[0.93797391, 0.72535065, 0.5664415,  0.38982197, 0.72511378, 0.74254689,
 #  0.64629604, 0.45322563, 0.56448664, 0.64669521, 0.56086757, 0.34403293,
 #  0.38618253, 0.4489219,  0.34381325, 0.05956293]  # Only used if initial_state = :custom
 n_init = Float64[0.98400857, 0.9067791,  0.64942285, 0.26006638, 0.90650907, 0.92126638,
  0.73589202, 0.29638348, 0.64594834, 0.73521303, 0.52024279, 0.16672827,
- 0.25717178, 0.29222877, 0.16017891, 0.01662694]
+ 0.25717178, 0.29222877, 0.16017891, 0.01662694]  # Not used unless initial_state = :custom
+
+order = Any[]
+if fermions
+    # specific order for the Quantinuum H1-1 device.
+    order = Any[
+            [(2,3),(6,7),(5,9),(8,12),(10,11),(14,15)], 
+            [(2,6),(3,7),(10,14),(11,15)], 
+            [(1,2),(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)], 
+            [(1,5),(4,8),(6,10),(7,11),(9,13),(12,16)]
+            ]
+else
+    order = default_circuit_order(Nx, Ny; staggered=true, alternating=true )  # Trotter order
+end
 
 
 
@@ -69,7 +83,8 @@ println("dt: $dt \n",
         "drive_type: $drive_type \n",
         "initial_state: $initial_state \n",
         "B: $B \n",
-        "site_out: $site_out \n")
+        "site_out: $site_out \n",
+        "trotter_evolution: $trotter_evolution \n")
 
 
 parameters = SimulationParameters(
@@ -88,6 +103,7 @@ parameters = SimulationParameters(
     even_parity=even_parity,
     pinned_corners=pinned_corners,
     single_shot=single_shot,
+    trotter_evolution=trotter_evolution,
     n_init=n_init
     )
 
@@ -114,13 +130,24 @@ filename *= "$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_
 if fermions == false
     filename *= "_order0123"
 end
+if trotter_evolution
+    filename *= "_trotter"
+end
 if run_id !== nothing
     filename *= "_run$(run_id)"
 end
 filename *= ".h5"
 
 
-hamiltonian = create_hamiltonian(Nx, Ny; B=B, V=V, fermions=fermions);
+hamiltonian = nothing
+if trotter_evolution
+    println("Using Trotter evolution.")
+    hamiltonian = create_circuit(Nx, Ny, order; B=B, V=V, fermions=fermions);
+else
+    println("Using full Hamiltonian evolution.")
+    hamiltonian = create_hamiltonian(Nx, Ny; B=B, V=V, fermions=fermions);
+end
+
 GC.gc();
 
 ψ = generate_initial_state(Nx, Ny; initial_state=initial_state, n_init=n_init);

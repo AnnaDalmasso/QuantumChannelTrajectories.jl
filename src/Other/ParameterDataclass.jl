@@ -19,6 +19,7 @@ struct SimulationParameters
     even_parity::Bool  # Optional parameter for even parity
     pinned_corners::Bool  # Optional parameter for pinned corners
     single_shot::Bool  # Optional parameter for single shot measurements
+    trotter_evolution::Bool  # Optional parameter for Trotter evolution
     n_init::Vector{Float64}  # Optional parameter for custom initial state
 end
 
@@ -29,6 +30,7 @@ function SimulationParameters(; steps, num_iterations, Nx, Ny, p, bonds, site_in
                             even_parity = false,
                             pinned_corners = false,
                             single_shot = false,
+                            trotter_evolution = false,
                             n_init = Float64[])
     return SimulationParameters(steps, num_iterations, Nx, Ny, dt, p, B, bonds, site_in, site_out, drive_type, initial_state, even_parity, pinned_corners, single_shot, n_init)
 end
@@ -51,6 +53,7 @@ function to_dict(params::SimulationParameters)
         :even_parity => params.even_parity,
         :pinned_corners => params.pinned_corners,
         :single_shot => params.single_shot,
+        :trotter_evolution => params.trotter_evolution,
         :n_init => params.n_init
     )
 end
@@ -73,6 +76,7 @@ function from_dict(dict::Dict)
         even_parity = dict[:even_parity],
         pinned_corners = dict[:pinned_corners],
         single_shot = dict[:single_shot],
+        trotter_evolution = dict[:trotter_evolution],
         n_init = dict[:n_init]
     )
 end

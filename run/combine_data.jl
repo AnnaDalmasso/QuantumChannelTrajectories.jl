@@ -21,6 +21,7 @@ site_out = N  # Site where the current is extracted
 even_parity = false  # Whether to enforce even parity
 pinned_corners = true  # Whether to pin the corners
 single_shot = false  # Whether to perform single shot measurements
+trotter_evolution = false  # Whether to use Trotter evolution
 ###############################################
 
 bonds = get_bonds(Nx, Ny, site_in, site_out)
@@ -53,6 +54,9 @@ end
 # end
 if single_shot
     filename *= "_single_shot"
+end
+if trotter_evolution
+    filename *= "_trotter"
 end
 
 num_processes = 100
@@ -108,6 +112,9 @@ end
 # end
 if single_shot
     filename *= "_single_shot"
+end
+if trotter_evolution
+    filename *= "_trotter"
 end
 
 save_to_hdf5(final_data, filename * ".h5")
