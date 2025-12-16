@@ -12,28 +12,39 @@ if length(ARGS) > 0
 end
 
 # Parameters set at runtime
-dt = parse(Float64, ARGS[2])  # Time step
-p = parse(Float64, ARGS[3])  # Probability of hopping
-Nx = parse(Int, ARGS[4])  # Number of sites in x-direction
-Ny = parse(Int, ARGS[5])  # Number of sites in y-direction
-V = parse(Float64, ARGS[6])  # Interaction strength
-b = parse(Float64, ARGS[7])  # Magnetic field strength
-num_iterations = parse(Int, ARGS[8])  # Number of iterations
-steps = parse(Int, ARGS[9])  # Number of steps in each iteration
-fermions = parse(Bool, ARGS[10])  # Whether to use fermionic statistics
+# dt = parse(Float64, ARGS[2])  # Time step
+# p = parse(Float64, ARGS[3])  # Probability of hopping
+# Nx = parse(Int, ARGS[4])  # Number of sites in x-direction
+# Ny = parse(Int, ARGS[5])  # Number of sites in y-direction
+# V = parse(Float64, ARGS[6])  # Interaction strength
+# b = parse(Float64, ARGS[7])  # Magnetic field strength
+# num_iterations = parse(Int, ARGS[8])  # Number of iterations
+# steps = parse(Int, ARGS[9])  # Number of steps in each iteration
+# fermions = parse(Bool, ARGS[10])  # Whether to use fermionic statistics
+
+# TO RUN LOCALLY WITHOUT .SH :
+dt = 0.31  # Time step
+p = 2*dt  # Probability of hopping
+Nx = 4  # Number of sites in x-direction
+Ny = 4  # Number of sites in y-direction
+V = 0.0  # Interaction strength
+b = 0.0  # Magnetic field strength
+num_iterations = 1280  # Number of iterations
+steps = 10  # Number of steps in each iteration
+fermions = false  # Whether to use fermionic statistics
 
 # Change these parameters as needed
 N = Nx*Ny
 site_in = 1  # Site where the current is injected
 drive_type = :current  # :current, :dephasing
-initial_state = :custom  # :checkerboard, :empty, :filled, :random, :custom
+initial_state = :random  # :checkerboard, :empty, :filled, :random, :custom
 B = b*pi # Magnetic field in units of flux quantum
 site_out = N  # Site where the current is extracted
 
 # Optional parameters
 even_parity = false  # Whether to enforce even parity
 pinned_corners = true  # Whether to pin the corners
-single_shot = false
+single_shot = true
 # n_init = Float64[0.93797391, 0.72535065, 0.5664415,  0.38982197, 0.72511378, 0.74254689,
 #  0.64629604, 0.45322563, 0.56448664, 0.64669521, 0.56086757, 0.34403293,
 #  0.38618253, 0.4489219,  0.34381325, 0.05956293]  # Only used if initial_state = :custom
@@ -63,6 +74,7 @@ println("dt: $dt \n",
 
 parameters = SimulationParameters(
     steps=steps, 
+    num_iterations=num_iterations, 
     Nx=Nx, 
     Ny=Ny, 
     dt=dt,
@@ -83,20 +95,24 @@ parameters = SimulationParameters(
 
 filename = ""
 if fermions
-    filename = "data/fermions_"
+    filename = "data/fermions/$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)/"
 else
-    filename = "data/bosons_"
+    filename = "data/bosons/$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)_order0123/"
 end
 
-filename *= "$(Nx)x$(Ny)_dt$(dt)_p$(p)_b$(b)_V$(V)_steps$(steps)_trajectories$(num_iterations)_$(string(drive_type))_$(string(initial_state))"
-if even_parity
-    filename *= "_even_parity"
-end
-if pinned_corners
-    filename *= "_pinned_corners"
-end
-if single_shot
-    filename *= "_single_shot"
+# filename *= "$(Nx)x$(Ny)_dt$(dt)_p$(p)_b$(b)_V$(V)_steps$(steps)_trajectories$(num_iterations)_$(string(drive_type))_$(string(initial_state))"
+filename *= "$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)"
+# if even_parity
+#     filename *= "_even_parity"
+# end
+# if pinned_corners
+#     filename *= "_pinned_corners"
+# end
+# if single_shot
+#     filename *= "_single_shot"
+# end
+if fermions == false
+    filename *= "_order0123"
 end
 if run_id !== nothing
     filename *= "_run$(run_id)"

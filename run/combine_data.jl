@@ -2,19 +2,19 @@ using Printf
 using QuantumChannelTrajectories
 
 
-dt = 0.25
-p = 0.5
+dt = 0.02
+p = 0.04
 Nx = 4
 Ny = 4
 N = Nx*Ny
-V = 4.0
-b = 0.0 #2/((Nx-1)*(Ny-1))  # Magnetic field strength
+V = 1.0
+b = 0.5 #2/((Nx-1)*(Ny-1))  # Magnetic field strength
 num_iterations = 100
-steps = 100
+steps = 1000
 site_in = 1  # Site where the current is injected
 drive_type = :current  # :current, :dephasing
-initial_state = :custom  # :checkerboard, :empty, :filled, :random, :custom
-fermions = false  # Whether to use fermionic statistics
+initial_state = :random  # :checkerboard, :empty, :filled, :random, :custom
+fermions = true  # Whether to use fermionic statistics
 B = b*pi # Magnetic field in units of flux quantum
 site_out = N  # Site where the current is extracted
 # Optional parameters
@@ -38,22 +38,24 @@ parameters = nothing
 
 filename = ""
 if fermions
-    filename = "data/fermions_"
+    filename = "data/fermions/$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)/"
+    filename *= "$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)"
 else
-    filename = "data/bosons_"
+    filename = "data/bosons/$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)_order0123/"
+    filename *= "$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(num_iterations)_order0123"
 end
-filename *= "$(Nx)x$(Ny)_dt$(dt)_p$(p)_b$(b)_V$(V)_steps$(steps)_trajectories$(num_iterations)_$(string(drive_type))_$(string(initial_state))"
-if even_parity
-    filename *= "_even_parity"
-end
-if pinned_corners
-    filename *= "_pinned_corners"
-end
+
+# if even_parity
+#     filename *= "_even_parity"
+# end
+# if pinned_corners
+#     filename *= "_pinned_corners"
+# end
 if single_shot
     filename *= "_single_shot"
 end
 
-num_processes = 15
+num_processes = 100
 for run_idx in 1:num_processes
 
     if !isfile(filename * "_run$(run_idx)" * ".h5")
@@ -70,7 +72,7 @@ for run_idx in 1:num_processes
     global currents_sq_avg += data[:currents_sq_avg]
     global avg_dd_correlations += data[:avg_dd_correlations]
     global completed_trajectories += data[:completed_trajectories]
-
+    println("completed trajectories: $(completed_trajectories) after run $(run_idx)")
     if run_idx == 1
         global t_list = data[:t_list]
         global parameters = data[:params]
@@ -92,17 +94,18 @@ final_data = Dict(
 
 filename = ""
 if fermions
-    filename = "data/fermions_"
+    filename = "data/fermions/"
+    filename *= "$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(completed_trajectories)"
 else
-    filename = "data/bosons_"
+    filename = "data/bosons/"
+    filename *= "$(string(initial_state))_V$(V)_phi$(b)_dt$(dt)_p$(p)_steps$(steps)_shots$(completed_trajectories)_order0123"
 end
-filename *= "$(Nx)x$(Ny)_dt$(dt)_p$(p)_b$(b)_V$(V)_steps$(steps)_trajectories$(completed_trajectories)_$(string(drive_type))_$(string(initial_state))"
-if even_parity
-    filename *= "_even_parity"
-end
-if pinned_corners
-    filename *= "_pinned_corners"
-end
+# if even_parity
+#     filename *= "_even_parity"
+# end
+# if pinned_corners
+#     filename *= "_pinned_corners"
+# end
 if single_shot
     filename *= "_single_shot"
 end
