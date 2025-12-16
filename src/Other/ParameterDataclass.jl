@@ -5,6 +5,7 @@ export get_t_list
 
 struct SimulationParameters
     steps::Int
+    num_iterations::Int
     Nx::Int
     Ny::Int
     dt::Float64
@@ -22,20 +23,21 @@ struct SimulationParameters
 end
 
 # Constructor with default values
-function SimulationParameters(; steps, Nx, Ny, p, bonds, site_in, site_out, dt, B,
+function SimulationParameters(; steps, num_iterations, Nx, Ny, p, bonds, site_in, site_out, dt, B,
                             drive_type = :current, 
                             initial_state = :random,
                             even_parity = false,
                             pinned_corners = false,
                             single_shot = false,
                             n_init = Float64[])
-    return SimulationParameters(steps, Nx, Ny, dt, p, B, bonds, site_in, site_out, drive_type, initial_state, even_parity, pinned_corners, single_shot, n_init)
+    return SimulationParameters(steps, num_iterations, Nx, Ny, dt, p, B, bonds, site_in, site_out, drive_type, initial_state, even_parity, pinned_corners, single_shot, n_init)
 end
 
 
 function to_dict(params::SimulationParameters)
     return Dict(
         :steps => params.steps,
+        :num_iterations => params.num_iterations,
         :Nx => params.Nx,
         :Ny => params.Ny,
         :dt => params.dt,
@@ -57,6 +59,7 @@ end
 function from_dict(dict::Dict)
     return SimulationParameters(
         steps = dict[:steps],
+        num_iterations = dict[:num_iterations],
         Nx = dict[:Nx],
         Ny = dict[:Ny],
         dt = dict[:dt],

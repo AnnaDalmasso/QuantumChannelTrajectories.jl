@@ -5,6 +5,7 @@ export run_trajectories
 function trajectory(hamiltonian::SparseMatrixCSC, ψ_init::Vector, fermions::Bool, parameters::SimulationParameters)
     
     steps = parameters.steps
+    num_iterations = parameters.num_iterations
     Nx = parameters.Nx
     Ny = parameters.Ny
     dt = parameters.dt
@@ -76,6 +77,7 @@ function run_trajectories(hamiltonian::SparseMatrixCSC, ψ_init::Vector, num_ite
     end
 
     steps = parameters.steps
+    num_iterations = parameters.num_iterations
     Nx = parameters.Nx
     Ny = parameters.Ny
     bonds = parameters.bonds
